@@ -1,0 +1,421 @@
+/* BUDGETSENSE — NEO-BRUTALIST DESIGN SYSTEM 
+   Theme: High Contrast, Sharp Edges, Bold Typography
+*/
+
+:root {
+    --black: #000000;
+    --white: #ffffff;
+    --gray: #f0f0f0;
+    --pink: #ff90e8;
+    --yellow: #ffc900;
+    --cyan: #01d1ff;
+    --green: #00f5d4;
+    --red: #ff5c5c;
+    --border: 4px solid #000000;
+    --shadow: 8px 8px 0px #000000;
+    --shadow-sm: 4px 4px 0px #000000;
+}
+
+/* Global Styles */
+* {
+    box-sizing: border-box;
+    cursor: crosshair; /* Brutalist vibe */
+}
+
+body {
+    margin: 0;
+    font-family: 'Space Grotesk', 'DM Sans', sans-serif;
+    background-color: var(--white);
+    color: var(--black);
+    display: flex;
+    overflow-x: hidden;
+}
+
+/* SIDEBAR - Dark & Bold */
+.sidebar {
+    width: 280px;
+    height: 100vh;
+    border-right: var(--border);
+    padding: 30px 20px;
+    position: fixed;
+    background: var(--white);
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+}
+
+.logo-text {
+    font-family: 'Syne', sans-serif;
+    font-size: 24px;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.sidebar-user {
+    margin: 40px 0;
+    padding: 15px;
+    border: var(--border);
+    background: var(--gray);
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.avatar {
+    width: 50px;
+    height: 50px;
+    border: var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    position: relative;
+}
+
+.streak-badge {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    background: white;
+    border: 2px solid black;
+    border-radius: 50%;
+    padding: 2px;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 15px;
+    text-decoration: none;
+    color: var(--black);
+    font-weight: 700;
+    border: 2px solid transparent;
+    margin-bottom: 8px;
+    transition: 0.1s;
+}
+
+.nav-item.active, .nav-item:hover {
+    background: var(--yellow);
+    border: 2px solid black;
+    box-shadow: var(--shadow-sm);
+    transform: translate(-3px, -3px);
+}
+
+/* MAIN CONTENT */
+.main-content {
+    margin-left: 280px;
+    width: calc(100% - 280px);
+    min-height: 100vh;
+}
+
+.topbar {
+    padding: 30px 50px;
+    border-bottom: var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: white;
+    position: sticky;
+    top: 0;
+    z-index: 90;
+}
+
+.page-title h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 48px;
+    margin: 0;
+    text-transform: uppercase;
+}
+
+.btn-export, .btn-primary, .btn-filter {
+    padding: 12px 24px;
+    border: var(--border);
+    background: var(--cyan);
+    color: black;
+    font-weight: 800;
+    text-decoration: none;
+    box-shadow: var(--shadow-sm);
+    transition: 0.2s;
+}
+
+.btn-primary { background: var(--green); }
+
+.btn-primary:active, .btn-export:active {
+    transform: translate(4px, 4px);
+    box-shadow: 0px 0px 0px #000;
+}
+
+/* DASHBOARD GRID */
+.dashboard-scroll {
+    padding: 50px;
+}
+
+/* MOOD CARD */
+.mood-card {
+    padding: 40px;
+    border: var(--border);
+    box-shadow: var(--shadow);
+    margin-bottom: 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.mood-happy { background: var(--green); }
+.mood-neutral { background: var(--cyan); }
+.mood-sad { background: var(--pink); }
+
+.mood-emoji-large { font-size: 80px; }
+.mood-state { font-family: 'Syne'; font-size: 40px; margin: 0; }
+
+/* STATS GRID */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 30px;
+    margin-bottom: 40px;
+}
+
+.glass-card {
+    background: white;
+    border: var(--border);
+    padding: 25px;
+    box-shadow: var(--shadow);
+}
+
+.stat-label { font-weight: 800; font-size: 14px; text-transform: uppercase; margin-bottom: 10px; }
+.stat-value { font-family: 'Syne'; font-size: 32px; font-weight: 800; }
+
+/* BUDGET PROGRESS BAR */
+.progress-track {
+    height: 40px;
+    background: var(--white);
+    border: var(--border);
+    margin: 20px 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    transition: width 1s ease-in-out;
+}
+
+.progress-happy { background: var(--green); }
+.progress-neutral { background: var(--yellow); }
+.progress-sad { background: var(--red); }
+
+/* TABLES */
+.table-card { overflow-x: auto; margin-top: 20px; }
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.data-table th {
+    text-align: left;
+    padding: 20px;
+    border-bottom: var(--border);
+    font-weight: 800;
+    text-transform: uppercase;
+    background: var(--gray);
+}
+
+.data-table td {
+    padding: 20px;
+    border-bottom: 2px solid black;
+    font-weight: 500;
+}
+
+.cat-badge {
+    padding: 6px 12px;
+    border: 2px solid black;
+    font-weight: 800;
+    font-size: 12px;
+    text-transform: uppercase;
+}
+
+.cat-food { background: var(--pink); }
+.cat-travel { background: var(--cyan); }
+.cat-books { background: var(--yellow); }
+
+/* FILTERS */
+.filter-bar {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+}
+
+.search-input, .filter-select, .filter-input, .month-picker {
+    padding: 12px;
+    border: var(--border);
+    font-family: inherit;
+    font-weight: 700;
+    outline: none;
+}
+
+/* CHARTS SECTION */
+.charts-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 30px;
+}
+
+.chart-full { grid-column: span 2; }
+
+/* MODALS */
+.modal-overlay {
+    background: rgba(0,0,0,0.8);
+    backdrop-filter: blur(4px);
+}
+
+.modal {
+    max-width: 500px;
+    margin: 50px auto;
+    position: relative;
+}
+
+.form-group label { display: block; font-weight: 800; margin-bottom: 8px; }
+.form-group input, .form-group select, .form-group textarea {
+    width: 100%;
+    padding: 12px;
+    border: var(--border);
+    font-family: inherit;
+    font-weight: 600;
+}
+
+/* NOTIFICATION PANEL */
+.notif-panel {
+    position: absolute;
+    top: 90px;
+    right: 50px;
+    width: 350px;
+    border: var(--border);
+    background: white;
+    box-shadow: var(--shadow);
+    z-index: 1000;
+}
+
+.notif-item {
+    padding: 15px;
+    border-bottom: 2px solid black;
+    font-weight: 700;
+}
+
+.notif-danger { background: var(--red); color: white; }
+.notif-warn { background: var(--yellow); }
+.notif-success { background: var(--green); }
+
+/* Hide sections that are not active */
+.section { display: none; }
+.section.active { display: block; }
+
+/* MODAL OVERLAY - Screen motham block cheyakunda center cheyadaniki */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4); /* Light overlay for focus */
+    backdrop-filter: blur(2px);
+    display: none; /* JS tho control chesthunnam kabatti default hidden */
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+/* MODAL CARD - Floating Box style */
+.modal {
+    background: var(--white);
+    border: var(--border);
+    box-shadow: 12px 12px 0px #000; /* Extra bold shadow for Brutalist look */
+    width: 90%;
+    max-width: 450px; /* Fixes that wide screen issue */
+    padding: 30px;
+    position: relative;
+    animation: modalSlide 0.3s ease-out;
+}
+
+@keyframes modalSlide {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+/* MODAL HEADER */
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    border-bottom: 2px solid #000;
+    padding-bottom: 10px;
+}
+
+.modal-header h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 24px;
+    margin: 0;
+}
+
+.modal-close {
+    background: var(--red);
+    border: 2px solid #000;
+    color: white;
+    font-weight: bold;
+    padding: 5px 10px;
+    cursor: pointer;
+    box-shadow: 2px 2px 0px #000;
+}
+
+/* FORM ELEMENTS INSIDE MODAL */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 800;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    font-size: 13px;
+}
+
+.input-wrap input, 
+.styled-select, 
+textarea {
+    width: 100%;
+    padding: 12px;
+    border: var(--border);
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    background: #fff;
+    outline: none;
+}
+
+.input-wrap input:focus {
+    background: #f0f0f0;
+}
+
+/* MODAL ACTIONS - Buttons alignment */
+.modal-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 25px;
+}
+
+.modal-actions button {
+    flex: 1;
+}
+
+.btn-secondary {
+    background: #eee;
+    border: var(--border);
+    padding: 12px;
+    font-weight: 800;
+    box-shadow: var(--shadow-sm);
+}

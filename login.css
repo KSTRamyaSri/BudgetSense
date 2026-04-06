@@ -1,0 +1,180 @@
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@800&family=Space+Grotesk:wght@400;500;700&display=swap');
+
+:root {
+    --primary: #ff9100; /* Orange Base */
+    --pink: #ff90e8;    /* Pink Login Theme */
+    --yellow: #fff000;
+    --green: #05ffa1;
+    --black: #000000;
+    --white: #ffffff;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    background-color: var(--primary); /* Maintain primary brand color */
+    font-family: 'Space Grotesk', sans-serif;
+    min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px;
+}
+
+.auth-wrapper { width: 100%; max-width: 1050px; } /* Slightly wider for cartoon */
+
+.auth-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Balanced 50/50 Split */
+    border: 5px solid var(--black);
+    box-shadow: 15px 15px 0px var(--black);
+    background: var(--white);
+    overflow: hidden;
+}
+
+/* Left Section - Ensuring Cartoon Fits */
+.auth-info {
+    background-color: var(--pink); /* PINK Theme */
+    padding: 60px 40px;
+    border-right: 5px solid var(--black);
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    text-align: center;
+}
+
+.brand { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.5rem; margin-bottom: 40px; width: 100%; text-align: left;}
+
+.cartoon-box { max-width: 80%; margin-bottom: 30px; }
+.cartoon-img { 
+    max-width: 100%; 
+    height: auto; 
+    filter: drop-shadow(10px 10px 0px var(--black)); /* Neo-Brutalist Shadow */
+}
+
+.cartoon-subtitle { font-size: 1rem; font-weight: 600; line-height: 1.5; color: var(--black); }
+
+/* Right Section (Form) */
+.auth-form-card { padding: 60px; background: var(--white); display: flex; flex-direction: column; justify-content: center; }
+.auth-form-card h2 { font-family: 'Syne', sans-serif; font-size: 2.2rem; margin-bottom: 30px; }
+
+.input-group { margin-bottom: 25px; }
+.input-group label { display: block; font-weight: 800; font-size: 0.85rem; margin-bottom: 8px; text-transform: uppercase; }
+
+.input-wrapper { position: relative; display: flex; align-items: center; }
+.input-wrapper i { position: absolute; left: 15px; font-size: 1rem; }
+.input-wrapper input {
+    width: 100%; padding: 18px 15px 18px 50px;
+    border: 4px solid var(--black); font-family: inherit;
+    font-size: 1.1rem; font-weight: 500; outline: none; transition: 0.2s;
+}
+.input-wrapper input:focus { box-shadow: 4px 4px 0px var(--black); transform: translate(-2px, -2px); }
+
+.btn-login {
+    width: 100%; padding: 18px; background: var(--black); color: var(--white);
+    border: 3px solid var(--black); font-family: 'Syne', sans-serif;
+    font-weight: 800; font-size: 1.1rem; cursor: pointer;
+    box-shadow: 6px 6px 0px var(--green); transition: 0.2s;
+}
+.btn-login:hover { transform: translate(4px, 4px); box-shadow: none; }
+
+.switch-text { text-align: center; margin-top: 25px; font-weight: 600; font-size: 0.95rem; }
+.switch-text a { color: var(--black); font-weight: 800; text-decoration: underline; }
+
+.demo-box {
+    margin-top: 30px; padding: 15px; background: #f0f0f0; border: 2px dashed var(--black);
+    font-size: 0.85rem; text-align: center;
+}
+
+/* Alerts */
+.alert { padding: 15px; border: 3px solid var(--black); font-weight: 700; margin-bottom: 25px; background: #ff4d4d; color: white; }
+
+/* Animations */
+.animate-pop { animation: pop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+@keyframes pop { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+/* Responsive */
+@media (max-width: 900px) {
+    .auth-container { grid-template-columns: 1fr; }
+    .auth-info { border-right: none; border-bottom: 5px solid var(--black); padding: 40px; }
+    .auth-form-card { padding: 40px; }
+}
+
+/* Ee section ni matrame update cheyi */
+
+.auth-wrapper { 
+    width: 100%; 
+    max-width: 850px; /* Reduced from 1050px for a compact look */
+    margin: 0 auto;
+}
+
+.auth-container {
+    display: grid;
+    grid-template-columns: 1fr 1.1fr; /* Balanced split */
+    border: 5px solid var(--black);
+    box-shadow: 12px 12px 0px var(--black); /* Slightly smaller shadow */
+    background: var(--white);
+    overflow: hidden;
+    min-height: 500px; /* Fixed height for a neat look */
+}
+
+/* Left Section - Compact Padding */
+.auth-info {
+    background-color: var(--pink);
+    padding: 40px 30px; /* Reduced padding */
+    border-right: 5px solid var(--black);
+    display: flex; 
+    flex-direction: column; 
+    justify-content: center; 
+    align-items: center;
+}
+
+.brand { 
+    font-family: 'Syne', sans-serif; 
+    font-weight: 800; 
+    font-size: 1.2rem; 
+    margin-bottom: 20px; 
+    width: 100%; 
+    text-align: left;
+}
+
+.cartoon-box { 
+    max-width: 180px; /* Smaller cartoon for smaller box */
+    margin-bottom: 20px; 
+}
+
+.cartoon-subtitle { 
+    font-size: 0.9rem; 
+    font-weight: 600; 
+    line-height: 1.4; 
+}
+
+/* Right Section - Form Spacing */
+.auth-form-card { 
+    padding: 40px; /* Reduced from 60px */
+    background: var(--white); 
+    display: flex; 
+    flex-direction: column; 
+    justify-content: center; 
+}
+
+.auth-form-card h2 { 
+    font-family: 'Syne', sans-serif; 
+    font-size: 1.8rem; /* Smaller heading */
+    margin-bottom: 25px; 
+}
+
+.input-group { margin-bottom: 18px; }
+
+.input-wrapper input {
+    padding: 14px 15px 14px 45px; /* Compact inputs */
+    font-size: 1rem;
+}
+
+.btn-login {
+    padding: 15px;
+    font-size: 1rem;
+}
+
+/* Demo box adjustment */
+.demo-box {
+    margin-top: 20px;
+    padding: 10px;
+    font-size: 0.8rem;
+}
