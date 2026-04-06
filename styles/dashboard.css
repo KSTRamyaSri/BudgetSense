@@ -419,3 +419,132 @@ textarea {
     font-weight: 800;
     box-shadow: var(--shadow-sm);
 }
+
+:root {
+    --bg: #f4f4f4;
+    --border: 3px solid #000;
+    --shadow: 8px 8px 0px #000;
+    --happy-bg: #FFD700;
+    --sad-bg: #87CEEB;
+    --neutral-bg: #FFA500;
+    --white: #ffffff;
+}
+
+/* MODAL FIX - Direct solution for your issue */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: none; /* Initially hidden */
+    justify-content: center;
+    align-items: center;
+    z-index: 9999; /* Making sure it's on top */
+    backdrop-filter: blur(5px);
+}
+
+/* When active class added via JS */
+.modal-overlay.active {
+    display: flex;
+}
+
+.modal {
+    background: var(--white);
+    border: var(--border);
+    box-shadow: 15px 15px 0px #000;
+    width: 90%;
+    max-width: 500px;
+    padding: 2rem;
+    position: relative;
+    animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes popIn {
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+/* MOOD SHOWERS CONTAINER */
+#mood-shower-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 10;
+}
+
+.particle {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: #000;
+    border-radius: 50%;
+    animation: fall linear infinite;
+}
+
+@keyframes fall {
+    to { transform: translateY(100vh) rotate(360deg); }
+}
+
+/* CLEANING EMOJIS - Replacing icons with shapes or text */
+.nav-icon, .logo-icon, .stat-icon, .empty-emoji {
+    display: none !important; /* Forces no emojis */
+}
+
+/* SECTION ALIGNMENT */
+.main-content {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.section {
+    display: none; /* Navigation logic will handle this */
+    animation: fadeIn 0.4s ease;
+}
+
+.section.active {
+    display: block;
+}
+
+/* STATS CARDS - Vere level look */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 20px;
+}
+
+.stat-card {
+    border: var(--border);
+    padding: 1.5rem;
+    background: var(--white);
+    box-shadow: var(--shadow);
+    transition: 0.2s;
+}
+
+.stat-card:hover {
+    transform: translate(-4px, -4px);
+    box-shadow: 12px 12px 0px #000;
+}
+
+/* BUTTONS */
+.btn-primary {
+    background: #000;
+    color: #fff;
+    border: var(--border);
+    padding: 12px 25px;
+    font-weight: 800;
+    text-transform: uppercase;
+    cursor: pointer;
+    box-shadow: 4px 4px 0px #555;
+}
+
+.btn-primary:active {
+    transform: translate(2px, 2px);
+    box-shadow: 0px 0px 0px #000;
+}

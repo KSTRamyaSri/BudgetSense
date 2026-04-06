@@ -551,3 +551,65 @@ document.addEventListener('keydown', e => {
     if (notifPanel) notifPanel.style.display = 'none';
   }
 });
+
+// MODAL CONTROLS
+function openModal(id) {
+    const modal = document.getElementById(id);
+    modal.classList.add('active'); // CSS lo display flex chesthundhi
+    document.body.style.overflow = 'hidden'; // Scroll disable
+}
+
+function closeModal(id) {
+    const modal = document.getElementById(id);
+    modal.classList.remove('active');
+    document.body.style.overflow = 'auto';
+}
+
+// Close modal when clicking outside the box
+window.onclick = function(event) {
+    if (event.target.classList.contains('modal-overlay')) {
+        event.target.classList.remove('active');
+        document.body.style.overflow = 'auto';
+    }
+}
+
+// MOOD SHOWERS LOGIC
+function createMoodShower(mood) {
+    const container = document.createElement('div');
+    container.id = 'mood-shower-container';
+    document.body.appendChild(container);
+
+    let color = '#000';
+    if(mood === 'Happy') color = '#FFD700';
+    if(mood === 'Sad') color = '#0000FF';
+
+    for (let i = 0; i < 50; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.left = Math.random() * 100 + 'vw';
+        particle.style.backgroundColor = color;
+        particle.style.animationDuration = (Math.random() * 3 + 2) + 's';
+        particle.style.opacity = Math.random();
+        container.appendChild(particle);
+    }
+}
+
+// Start shower on load based on current mood
+document.addEventListener('DOMContentLoaded', () => {
+    if (CHART_DATA.currentMood) {
+        createMoodShower(CHART_DATA.currentMood);
+    }
+
+    // Section Switching Logic
+    const navItems = document.querySelectorAll('.nav-item');
+    navItems.forEach(item => {
+        item.addEventListener('click', (e) => {
+            const target = item.getAttribute('data-section');
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(target).classList.add('active');
+            
+            navItems.forEach(i => i.classList.remove('active'));
+            item.classList.add('active');
+        });
+    });
+});
