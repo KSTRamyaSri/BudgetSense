@@ -11,7 +11,7 @@ if (isset($_SESSION['user_id'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Welcome | BudgetSense</title>
-    <link rel="stylesheet" href="welcome.css">
+    <link rel="stylesheet" href="styles/welcome.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
@@ -22,7 +22,7 @@ if (isset($_SESSION['user_id'])) {
             <div class="logo"><i class="fas fa-bolt"></i> BUDGETSENSE</div>
             <div class="nav-links">
                 <a href="login.php" class="link-item">LOGIN</a>
-                <a href="register.php" class="btn-cta-sm">JOIN NOW</a>
+                <a href="signup.php" class="btn-cta-sm">JOIN NOW</a>
             </div>
         </nav>
 
@@ -32,11 +32,11 @@ if (isset($_SESSION['user_id'])) {
                 <h1>TRACK YOUR <span class="outline-text">CASH</span></h1>
                 <p>Stop wondering where your money went. Take control of your allowance with our smart student dashboard.</p>
                 <div class="hero-btns">
-                    <a href="register.php" class="btn-main">GET STARTED <i class="fas fa-arrow-right"></i></a>
+                    <a href="signup.php" class="btn-main">GET STARTED <i class="fas fa-arrow-right"></i></a>
                 </div>
             </div>
             <div class="hero-img-container">
-                <img src="hero-char.jpg" alt="Mascot" class="floating-img">
+                <img src="assets/hero-char.jpg" alt="Mascot" class="floating-img">
             </div>
         </header>
     </div>

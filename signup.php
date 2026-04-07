@@ -54,12 +54,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Join BudgetSense | Smart Student Budgeting</title>
-    <link rel="stylesheet" href="signup.css">
+    <link rel="stylesheet" href="styles/signup.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body class="auth-body">
 
 <div class="auth-wrapper">
+      <a href="index.php" style="position: absolute; top: 20px; left: 20px; text-decoration: none; color: #000; font-weight: bold; background: #fff; padding: 10px 20px; border: 3px solid #000; box-shadow: 5px 5px 0px #000; font-size: 0.9rem; display: flex; align-items: center; gap: 8px; transition: 0.2s; z-index: 100;">
+    <i class="fas fa-arrow-left"></i> BACK TO HOME
+</a>
     <div class="auth-container">
         <div class="auth-info">
             <div class="brand">

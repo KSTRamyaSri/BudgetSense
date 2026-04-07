@@ -1,58 +1,70 @@
 <?php
-// get_stats.php — Returns calculated financial stats + mood
+// get_stats.php
 session_start();
 require_once 'db.php';
+
+// Force JSON header immediately
 header('Content-Type: application/json');
 
 if (!isset($_SESSION['user_id'])) {
-    echo json_encode(['error' => 'Not authenticated']);
+    echo json_encode(['success' => false, 'error' => 'Not authenticated']);
     exit;
 }
 
-$userId = $_SESSION['user_id'];
-$month  = currentMonth();
+$userId = (int)$_SESSION['user_id'];
+// Validate month format (YYYY-MM)
+$month = isset($_GET['month']) && preg_match('/^\d{4}-\d{2}$/', $_GET['month']) ? $_GET['month'] : date('Y-m');
 
-// Totals
-$stmt = $pdo->prepare("SELECT COALESCE(SUM(amount),0) as total FROM income WHERE user_id = ? AND DATE_FORMAT(date,'%Y-%m') = ?");
-$stmt->execute([$userId, $month]);
-$totalIncome = (float)$stmt->fetch()['total'];
+try {
+    // 1. Get Total Income
+    $stmt = $conn->prepare("SELECT SUM(amount) as total FROM income WHERE user_id = ? AND date LIKE ?");
+    $monthParam = $month . '%';
+    $stmt->bind_param("is", $userId, $monthParam);
+    $stmt->execute();
+    $totalIncome = (float)($stmt->get_result()->fetch_assoc()['total'] ?? 0);
 
-$stmt = $pdo->prepare("SELECT COALESCE(SUM(amount),0) as total FROM expenses WHERE user_id = ? AND DATE_FORMAT(date,'%Y-%m') = ?");
-$stmt->execute([$userId, $month]);
-$totalExpenses = (float)$stmt->fetch()['total'];
+    // 2. Get Total Expenses
+    $stmt = $conn->prepare("SELECT SUM(amount) as total FROM expenses WHERE user_id = ? AND date LIKE ?");
+    $stmt->bind_param("is", $userId, $monthParam);
+    $stmt->execute();
+    $totalExpenses = (float)($stmt->get_result()->fetch_assoc()['total'] ?? 0);
 
-$stmt = $pdo->prepare("SELECT limit_amount FROM budget_limits WHERE user_id = ? AND month = ?");
-$stmt->execute([$userId, $month]);
-$budget = $stmt->fetch();
-$budgetLimit = $budget ? (float)$budget['limit_amount'] : 0;
+    // 3. Get Budget Limit
+    $stmt = $conn->prepare("SELECT amount FROM budget_limits WHERE user_id = ? AND month = ?");
+    $stmt->bind_param("is", $userId, $month);
+    $stmt->execute();
+    $budgetLimit = (float)($stmt->get_result()->fetch_assoc()['amount'] ?? 0);
 
-$savings = $totalIncome - $totalExpenses;
-$moodData = calculateMood($savings, $budgetLimit, $totalExpenses);
-$usagePct = $budgetLimit > 0 ? min(round(($totalExpenses / $budgetLimit) * 100, 1), 100) : 0;
+    // 4. Calculations
+    $savings = $totalIncome - $totalExpenses;
+    $usagePct = $budgetLimit > 0 ? round(($totalExpenses / $budgetLimit) * 100, 1) : 0;
 
-// AI Suggestion
-$suggestions = [
-    'Happy'   => ['Keep it up! Consider saving an extra 10% this month 🎯', 'You\'re doing great! Why not invest your savings? 📈', 'Excellent control! Try the 50/30/20 rule for optimal savings 💡'],
-    'Neutral' => ['Reduce Food spending by 20% to stay in the green 🍔', 'Consider cutting Entertainment costs this week 🎮', 'Review your Shopping list — do you really need everything? 🛍️'],
-    'Sad'     => ['You\'ve exceeded your budget! Freeze discretionary spending now 🚫', 'Create a spending plan for the rest of the month 📋', 'Look for free alternatives to your top expense category 💭'],
-];
-$mood = $moodData['mood'];
-$suggestion = $suggestions[$mood][array_rand($suggestions[$mood])];
+    // 5. Logic for Mood & Message (Fixes the JS "undefined" issue)
+    $mood = "Neutral";
+    $message = "Keep tracking your spending! 📊";
 
-// Update mood history
-$today = date('Y-m-d');
-$stmt = $pdo->prepare("INSERT INTO mood_history (user_id, mood, savings, budget_usage, recorded_date) VALUES (?,?,?,?,?) ON DUPLICATE KEY UPDATE mood=VALUES(mood)");
-$stmt->execute([$userId, $mood, $savings, $usagePct, $today]);
+    if ($savings > 0 && $usagePct < 80) {
+        $mood = "Happy";
+        $message = "Great job! You're living within your means. 🌟";
+    } elseif ($usagePct >= 100) {
+        $mood = "Sad";
+        $message = "Warning: You have exceeded your budget! ⚠️";
+    } elseif ($savings < 0) {
+        $mood = "Sad";
+        $message = "You're spending more than you earn this month. 💸";
+    }
 
-echo json_encode([
-    'mood'          => $mood,
-    'emoji'         => $moodData['emoji'],
-    'message'       => $moodData['message'],
-    'class'         => $moodData['class'],
-    'usage_pct'     => $usagePct,
-    'total_income'  => $totalIncome,
-    'total_expenses'=> $totalExpenses,
-    'savings'       => $savings,
-    'budget_limit'  => $budgetLimit,
-    'suggestion'    => $suggestion,
-]);
+    echo json_encode([
+        'success'        => true,
+        'mood'           => $mood,
+        'message'        => $message, // Matches your JS logic
+        'usage_pct'      => $usagePct,
+        'total_income'   => $totalIncome,
+        'total_expenses' => $totalExpenses,
+        'savings'        => $savings,
+        'budget_limit'   => $budgetLimit
+    ]);
+
+} catch (Exception $e) {
+    echo json_encode(['success' => false, 'error' => 'Server error occurred']);
+}
