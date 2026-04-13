@@ -22,7 +22,7 @@
   
   **1. The Welcome Portal**
   <br>
-  <img src="screenshots/welcome-page.png" alt="Welcome Page" width="800" style="border-radius: 10px; box-shadow: 0px 4px 15px rgba(0,0,0,0.1);"/>
+  <img src="screenshots/welocme-page.png" alt="Welcome Page" width="800" style="border-radius: 10px; box-shadow: 0px 4px 15px rgba(0,0,0,0.1);"/>
   <br><br>
 
   **2. Core Dashboard Analytics & States**
