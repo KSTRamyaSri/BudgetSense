@@ -33,7 +33,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $colors = ['#4F46E5','#06B6D4','#22C55E','#F59E0B','#EC4899','#8B5CF6'];
             $color = $colors[array_rand($colors)];
             
-            // Added security_key to the insertion
             $stmt = $conn->prepare("INSERT INTO users (name, email, password, avatar_color, security_key) VALUES (?, ?, ?, ?, ?)");
             $stmt->bind_param('sssss', $name, $email, $hashed, $color, $s_key);
             
@@ -50,7 +49,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -84,31 +82,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </a>
     </div>
 
-    <div class="w-full max-w-4xl bg-white rounded-[2rem] overflow-hidden flex flex-col md:flex-row shadow-2xl shadow-slate-200/50 my-auto">
+    <div class="w-full max-w-5xl bg-white rounded-[2rem] overflow-hidden flex flex-col md:flex-row shadow-2xl shadow-slate-200/50 my-auto min-h-[600px]">
         
-        <div class="md:w-5/12 side-panel p-8 md:p-12 text-white flex flex-col justify-between relative">
-            <div class="z-10">
-                <div class="flex items-center gap-2 mb-8">
+        <div class="md:w-5/12 side-panel p-8 md:p-10 text-white flex flex-col relative overflow-hidden">
+            <div class="z-10 relative">
+                <div class="flex items-center gap-2 mb-6">
                     <i class="fas fa-chart-pie text-xl"></i>
                     <span class="text-sm font-black uppercase tracking-[3px]">BudgetSense</span>
                 </div>
                 <h2 class="text-3xl font-black leading-tight mb-4 uppercase">Join The<br>Squad.</h2>
-                <div class="space-y-3 mt-8">
-                    <div class="flex items-center gap-3 text-xs font-bold opacity-80 uppercase tracking-wider">
-                        <i class="fas fa-check-circle"></i> Daily Tracking
-                    </div>
-                    <div class="flex items-center gap-3 text-xs font-bold opacity-80 uppercase tracking-wider">
-                        <i class="fas fa-check-circle"></i> Smart Insights
-                    </div>
-                    <div class="flex items-center gap-3 text-xs font-bold opacity-80 uppercase tracking-wider">
-                        <i class="fas fa-check-circle"></i> Mood Analysis
-                    </div>
-                </div>
             </div>
             
-            <div class="mt-8 flex justify-center md:block">
-                <img src="assets/welcome1.jpg" class="w-24 md:w-44 opacity-90 drop-shadow-xl mx-auto md:mx-0">
+            <div class="hidden md:flex flex-1 items-center justify-center w-full mt-6 relative z-10">
+                <img src="assets/signup.png" class="w-full max-w-[360px] object-contain drop-shadow-2xl transform hover:scale-105 transition duration-500">
             </div>
+
+            <div class="absolute bottom-[-10%] left-[-10%] w-56 h-56 bg-white/10 rounded-full blur-3xl"></div>
         </div>
 
         <div class="md:w-7/12 p-8 md:p-12 flex flex-col justify-center bg-white">
@@ -132,13 +121,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <form method="POST" action="" class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="md:col-span-2 space-y-1.5">
                     <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Full Name</label>
-                    <input type="text" name="name" required placeholder="e.g. John"
+                    <input type="text" name="name" required placeholder="e.g. Ramya Sri"
                         class="w-full px-5 py-3 bg-slate-50 border border-slate-100 rounded-xl focus:border-indigo-500 outline-none transition text-sm text-slate-700 font-medium">
                 </div>
 
                 <div class="md:col-span-2 space-y-1.5">
                     <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Email Address</label>
-                    <input type="email" name="email" required placeholder="name@domain.com"
+                    <input type="email" name="email" required placeholder="name@college.edu"
                         class="w-full px-5 py-3 bg-slate-50 border border-slate-100 rounded-xl focus:border-indigo-500 outline-none transition text-sm text-slate-700 font-medium">
                 </div>
 
@@ -170,10 +159,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </p>
         </div>
     </div>
-
-    <div class="mt-8 opacity-20">
-        <p class="text-[9px] font-black uppercase tracking-[5px]">Core Systems v2.6.0</p>
-    </div>
-
 </body>
 </html>

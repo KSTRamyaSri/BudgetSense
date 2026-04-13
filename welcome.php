@@ -10,175 +10,204 @@ if (isset($_SESSION['user_id'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BudgetSense | Professional Finance Tracking</title>
+    <title>BudgetSense | Precision Finance Tracking</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        body { font-family: 'Inter', sans-serif; background-color: #ffffff; overflow-x: hidden; }
         
-        .gradient-text {
+        /* 1. HERO ORGANIC SHAPES */
+        .hero-bg-shape {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 60%;
+            height: 100%;
+            background: #f8fafc;
+            clip-path: polygon(25% 0%, 100% 0%, 100% 100%, 0% 100%);
+            z-index: 0;
+        }
+
+        .hero-curve {
+            position: absolute;
+            top: 15%;
+            right: -5%;
+            width: 55%;
+            height: 75%;
             background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            border-radius: 45% 55% 40% 60% / 60% 40% 60% 40%;
+            opacity: 0.12;
+            animation: morph 12s ease-in-out infinite;
+            z-index: 0;
         }
 
-        .glass-nav {
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-        }
-
-        /* Professional Scrolling Ticker */
-        .ticker-container {
+        /* 2. IMAGE MASK (Fixed Size) */
+        .image-mask {
+            border-radius: 48% 52% 68% 32% / 43% 46% 54% 57%;
             overflow: hidden;
-            background: #ffffff;
-            border-top: 1px solid #e2e8f0;
-            border-bottom: 1px solid #e2e8f0;
-            padding: 15px 0;
+            border: 10px solid white;
+            box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.15);
+            background: white;
+            width: 320px; /* Kept fixed as requested */
+            height: 440px;
         }
 
-        .ticker-wrapper {
-            display: flex;
-            white-space: nowrap;
-            animation: scroll 30s linear infinite;
+        @keyframes morph {
+            0% { border-radius: 45% 55% 40% 60% / 60% 40% 60% 40%; transform: scale(1); }
+            50% { border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; transform: scale(1.05); }
+            100% { border-radius: 45% 55% 40% 60% / 60% 40% 60% 40%; transform: scale(1); }
         }
 
-        .ticker-item {
+        .animate-float { animation: float 6s ease-in-out infinite; }
+        @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-15px); } 100% { transform: translateY(0px); } }
+
+        /* 3. VARIETY WORKFLOW BOXES (Vibrant Design) */
+        .wf-box {
+            position: relative;
+            padding: 3rem 2rem;
+            border-radius: 2.5rem;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+            background: white;
+            border: 1px solid #f1f5f9;
+        }
+        .wf-box:hover { transform: translateY(-15px); }
+
+        .wf-box-1:hover { background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); color: white; }
+        .wf-box-2:hover { background: linear-gradient(135deg, #a855f7 0%, #9333ea 100%); color: white; }
+        .wf-box-3:hover { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; }
+
+        .wf-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 1.25rem;
             display: flex;
             align-items: center;
-            padding: 0 40px;
-            color: #64748b;
-            font-weight: 500;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            transition: 0.5s;
         }
+        .wf-box:hover .wf-icon { background: rgba(255,255,255,0.2); color: white; transform: rotate(10deg); }
 
-        .ticker-item i { margin-right: 10px; color: #6366f1; }
+        .wf-box-1 .wf-icon { background: #eef2ff; color: #6366f1; }
+        .wf-box-2 .wf-icon { background: #f5f3ff; color: #a855f7; }
+        .wf-box-3 .wf-icon { background: #ecfdf5; color: #10b981; }
 
-        @keyframes scroll {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
-        }
+        .wf-box p { transition: 0.5s; }
+        .wf-box:hover p { color: rgba(255,255,255,0.8); }
 
-        .card-hover:hover {
-            transform: translateY(-10px);
-            transition: all 0.3s ease;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-        }
     </style>
 </head>
 <body class="text-slate-800">
 
-    <nav class="glass-nav fixed w-full z-50 top-0 left-0">
+    <nav class="fixed w-full z-50 top-0 left-0 bg-white/80 backdrop-blur-md border-b border-slate-100">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-20 items-center">
-                <div class="flex items-center gap-2">
-                    <div class="bg-indigo-600 p-2 rounded-lg text-white">
+                <div class="flex items-center gap-3">
+                    <div class="bg-indigo-600 p-2 rounded-xl text-white shadow-lg shadow-indigo-200">
                         <i class="fas fa-chart-pie"></i>
                     </div>
-                    <span class="text-xl font-bold tracking-tight text-slate-900">BUDGET<span class="text-indigo-600">SENSE</span></span>
+                    <span class="text-xl font-black tracking-tighter text-slate-900 uppercase">BudgetSense</span>
                 </div>
-                <div class="hidden md:flex items-center space-x-8">
-                    <a href="login.php" class="font-semibold text-slate-600 hover:text-indigo-600 transition">Login</a>
-                    <a href="signup.php" class="bg-indigo-600 text-white px-6 py-2.5 rounded-full font-semibold hover:bg-indigo-700 transition shadow-lg shadow-indigo-200">Get Started</a>
-                </div>
-                <div class="md:hidden">
-                    <a href="login.php" class="text-indigo-600 font-bold">LOGIN</a>
+                <div class="hidden md:flex items-center space-x-10">
+                    <a href="#about" class="text-[11px] font-black uppercase tracking-widest text-slate-400 hover:text-indigo-600 transition">About</a>
+                    <a href="login.php" class="text-[11px] font-black uppercase tracking-widest text-slate-400 hover:text-indigo-600 transition">Login</a>
+                    <a href="signup.php" class="bg-indigo-600 text-white px-7 py-3 rounded-full text-[11px] font-black uppercase tracking-widest hover:bg-indigo-700 transition shadow-xl shadow-indigo-100">Initialize Account</a>
                 </div>
             </div>
         </div>
     </nav>
 
-    <section class="pt-32 pb-20 bg-white">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col lg:flex-row items-center">
-            <div class="lg:w-1/2 text-center lg:text-left">
-                <span class="inline-block py-1 px-3 rounded-full bg-indigo-50 text-indigo-600 text-sm font-bold mb-6">
-                    FINANCE MANAGEMENT 2026
-                </span>
-                <h1 class="text-5xl lg:text-7xl font-extrabold leading-tight mb-6">
-                    Master your <span class="gradient-text">Capital</span> with Precision.
-                </h1>
-                <p class="text-lg text-slate-500 mb-10 max-w-lg mx-auto lg:mx-0">
-                    A professional-grade dashboard designed for students and professionals to track every rupee, set goals, and gain financial freedom.
+    <section class="relative min-h-screen flex items-center pt-20 overflow-hidden bg-white">
+        <div class="hero-bg-shape"></div>
+        <div class="hero-curve"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full relative z-10">
+            <div class="flex flex-col lg:flex-row items-center gap-16">
+                
+                <div class="lg:w-1/2 text-center lg:text-left">
+                    <div class="w-16 h-1.5 bg-indigo-600 mb-8 mx-auto lg:mx-0 rounded-full"></div>
+                    <h4 class="text-indigo-600 font-black text-xs uppercase tracking-[5px] mb-4">Core Management</h4>
+                    <h1 class="text-6xl lg:text-8xl font-black leading-[0.95] mb-8 tracking-tighter uppercase text-slate-900">
+                        Expense <br><span class="text-indigo-600 italic">Tracker.</span>
+                    </h1>
+                    <p class="text-lg text-slate-500 mb-10 max-w-lg mx-auto lg:mx-0 font-medium">
+                        Monitor daily outflows, configure smart limits, and maintain a happy financial sentiment with our high-end encrypted dashboard.
+                    </p>
+                    <div class="flex justify-center lg:justify-start">
+                        <a href="signup.php" class="bg-slate-900 text-white px-10 py-5 rounded-full text-xs font-black uppercase tracking-[3px] hover:bg-indigo-600 transition shadow-2xl">
+                            Explore Portal
+                        </a>
+                    </div>
+                </div>
+
+                <div class="lg:w-1/2 flex justify-center relative">
+                    <div class="relative animate-float">
+                        <div class="image-mask">
+                            <img src="assets/welcome2.png" alt="Interface" class="w-full h-full object-cover">
+                        </div>
+                        <div class="absolute -top-6 -right-6 bg-white p-5 rounded-[2rem] shadow-2xl hidden md:block">
+                            <i class="fas fa-shield-halved text-indigo-600 text-3xl"></i>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <section id="about" class="py-32 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center gap-20">
+            <div class="md:w-1/4 relative"> <div class="absolute inset-0 bg-indigo-50 rounded-[3rem] transform rotate-6 scale-105 z-0"></div>
+                <img src="assets/welcome1.png" alt="About" class="relative z-10 w-full max-w-[240px] mx-auto drop-shadow-2xl rounded-[2.5rem]">
+            </div>
+            <div class="md:w-3/4 text-center md:text-left">
+                <h4 class="text-indigo-600 font-black text-[10px] uppercase tracking-[5px] mb-4">Architecture</h4>
+                <h3 class="text-4xl lg:text-5xl font-black text-slate-900 mb-8 italic uppercase tracking-tight">Engineered for Precision.</h3>
+                <p class="text-lg text-slate-500 leading-relaxed mb-10 font-medium">
+                    BudgetSense provides a strictly professional workspace to monitor your financial health. By focusing on data integrity and clean visualizations, we ensure you stay ahead of your spending habits.
                 </p>
-                <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-                    <a href="signup.php" class="bg-slate-900 text-white px-8 py-4 rounded-xl font-bold hover:bg-slate-800 transition text-center shadow-xl">
-                        Create Free Account
-                    </a>
-                    <a href="#" class="flex items-center justify-center gap-2 px-8 py-4 font-semibold text-slate-600 hover:text-indigo-600 transition">
-                        <i class="fas fa-play-circle text-2xl"></i> View Demo
-                    </a>
-                </div>
-            </div>
-            <div class="lg:w-1/2 mt-16 lg:mt-0 px-4">
-                <div class="relative">
-                    <div class="absolute -top-10 -left-10 w-64 h-64 bg-purple-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30"></div>
-                    <div class="absolute -bottom-10 -right-10 w-64 h-64 bg-indigo-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30"></div>
-                    <img src="assets/welcome1.jpg" alt="Professional Finance" class="relative z-10 w-full max-w-md mx-auto">
+                <div class="flex flex-wrap gap-12 justify-center md:justify-start">
+                    <div><h5 class="text-3xl font-black text-slate-900">256-Bit</h5><p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">SSL Security</p></div>
+                    <div><h5 class="text-3xl font-black text-indigo-600">Active</h5><p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">Cloud Servers</p></div>
                 </div>
             </div>
         </div>
     </section>
 
-    <div class="ticker-container">
-        <div class="ticker-wrapper">
-            <div class="ticker-item"><i class="fas fa-check-circle"></i> Real-time Expense Tracking</div>
-            <div class="ticker-item"><i class="fas fa-check-circle"></i> Automated Budget Alerts</div>
-            <div class="ticker-item"><i class="fas fa-check-circle"></i> Secure Data Encryption</div>
-            <div class="ticker-item"><i class="fas fa-check-circle"></i> Financial Insight Reports</div>
-            <div class="ticker-item"><i class="fas fa-check-circle"></i> Multi-device Sync</div>
-            <div class="ticker-item"><i class="fas fa-check-circle"></i> Real-time Expense Tracking</div>
-            <div class="ticker-item"><i class="fas fa-check-circle"></i> Automated Budget Alerts</div>
-            <div class="ticker-item"><i class="fas fa-check-circle"></i> Secure Data Encryption</div>
-            <div class="ticker-item"><i class="fas fa-check-circle"></i> Financial Insight Reports</div>
-            <div class="ticker-item"><i class="fas fa-check-circle"></i> Multi-device Sync</div>
+    <section class="py-32 bg-slate-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center mb-20">
+            <h2 class="text-4xl font-black text-slate-900 italic uppercase">System Workflow.</h2>
         </div>
-    </div>
-
-    <section class="py-24 bg-slate-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-16">
-                <h2 class="text-3xl font-bold text-slate-900 mb-4">The BudgetSense Workflow</h2>
-                <div class="w-20 h-1 bg-indigo-600 mx-auto rounded-full"></div>
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="wf-box wf-box-1 shadow-sm">
+                <div class="wf-icon"><i class="fas fa-database"></i></div>
+                <h3 class="text-xl font-black uppercase mb-4 tracking-tight">Asset Input</h3>
+                <p class="text-slate-500 font-medium leading-relaxed">Securely log your monthly income and allowances to establish a comprehensive financial baseline.</p>
             </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div class="bg-white p-10 rounded-3xl shadow-sm border border-slate-100 card-hover">
-                    <div class="w-14 h-14 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600 text-2xl mb-6">
-                        <i class="fas fa-wallet"></i>
-                    </div>
-                    <h3 class="text-xl font-bold mb-3">Asset Income</h3>
-                    <p class="text-slate-500 leading-relaxed">Systematically record your monthly allowance or earnings. Establish your financial baseline.</p>
-                </div>
 
-                <div class="bg-white p-10 rounded-3xl shadow-sm border border-slate-100 card-hover">
-                    <div class="w-14 h-14 bg-purple-50 rounded-2xl flex items-center justify-center text-purple-600 text-2xl mb-6">
-                        <i class="fas fa-crosshairs"></i>
-                    </div>
-                    <h3 class="text-xl font-bold mb-3">Budget Planning</h3>
-                    <p class="text-slate-500 leading-relaxed">Define smart spending thresholds. Optimize your resources and target a 20% savings ratio.</p>
-                </div>
+            <div class="wf-box wf-box-2 shadow-sm">
+                <div class="wf-icon"><i class="fas fa-sliders"></i></div>
+                <h3 class="text-xl font-black uppercase mb-4 tracking-tight">Limit Config</h3>
+                <p class="text-slate-500 font-medium leading-relaxed">Configure smart budget limits and savings goals tailored to your monthly operational requirements.</p>
+            </div>
 
-                <div class="bg-white p-10 rounded-3xl shadow-sm border border-slate-100 card-hover">
-                    <div class="w-14 h-14 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600 text-2xl mb-6">
-                        <i class="fas fa-chart-line"></i>
-                    </div>
-                    <h3 class="text-xl font-bold mb-3">Expense Analytics</h3>
-                    <p class="text-slate-500 leading-relaxed">Monitor daily outflows across categories. Visualize your habits through professional analytics.</p>
-                </div>
+            <div class="wf-box wf-box-3 shadow-sm">
+                <div class="wf-icon"><i class="fas fa-chart-line"></i></div>
+                <h3 class="text-xl font-black uppercase mb-4 tracking-tight">Habit Intel</h3>
+                <p class="text-slate-500 font-medium leading-relaxed">Leverage professional-grade analytics to visualize spending patterns and optimize your trajectory.</p>
             </div>
         </div>
     </section>
 
-    <footer class="bg-white py-12 border-t border-slate-100">
-        <div class="max-w-7xl mx-auto px-4 text-center">
-            <p class="text-slate-400 font-medium tracking-wide text-sm">
-                &copy; 2026 BUDGETSENSE CORE SYSTEMS. ALL RIGHTS RESERVED.
-            </p>
-        </div>
+    <footer class="bg-white py-16 border-t border-slate-100 text-center">
+        <p class="text-slate-400 font-black tracking-[4px] uppercase text-[9px]">
+            &copy; 2026 Core Systems. Engineered for Tulasi.
+        </p>
     </footer>
 
 </body>

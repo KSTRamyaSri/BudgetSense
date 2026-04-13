@@ -15,6 +15,7 @@ $month        = isset($_GET['month']) ? sanitize($conn, $_GET['month']) : date('
 $mood_data = getMoodData($conn, $user_id, $month);
 $mood_class = strtolower($mood_data['mood']); 
 $budget_pct = min($mood_data['budget_usage_pct'], 100);
+$savings = $mood_data['savings'];
 
 $expenses = $conn->query("SELECT * FROM expenses WHERE user_id=$user_id AND DATE_FORMAT(date,'%Y-%m')='$month' ORDER BY date DESC");
 $income_rows = $conn->query("SELECT * FROM income WHERE user_id=$user_id AND DATE_FORMAT(date,'%Y-%m')='$month' ORDER BY date DESC");
@@ -32,16 +33,14 @@ for ($i = 5; $i >= 0; $i--) {
 $cat_data = $conn->query("SELECT category, SUM(amount) as total FROM expenses WHERE user_id=$user_id AND DATE_FORMAT(date,'%Y-%m')='$month' GROUP BY category");
 $cat_labels = []; $cat_amounts = [];
 while($r = $cat_data->fetch_assoc()){
-    $cat_labels[] = $r['category'];
-    $cat_amounts[] = (float)$r['total'];
+    $cat_labels[] = $r['category']; $cat_amounts[] = (float)$r['total'];
 }
 
-// Mood Analytics Data
+// Mood Analytics
 $mood_counts = $conn->query("SELECT mood, COUNT(*) as count FROM mood_history WHERE user_id=$user_id GROUP BY mood");
 $m_labels = []; $m_counts = [];
 while($row = $mood_counts->fetch_assoc()){
-    $m_labels[] = $row['mood'];
-    $m_counts[] = $row['count'];
+    $m_labels[] = $row['mood']; $m_counts[] = $row['count'];
 }
 
 $initials = strtoupper(substr($user_name, 0, 1));
@@ -63,53 +62,47 @@ if (strpos($user_name, ' ') !== false) {
     <script>
         tailwind.config = {
             darkMode: 'class',
-            theme: { extend: { colors: { neon: '#39FF14', darkBg: '#0a0a0a', cardDark: '#141414' } } }
+            theme: { extend: { colors: { neon: '#39FF14', darkBg: '#080808', cardDark: '#121212' } } }
         }
     </script>
     <style>
         body { font-family: 'Inter', sans-serif; transition: 0.3s; overflow-x: hidden; }
-        #weather-layer { position: fixed; inset: 0; pointer-events: none; z-index: 5; }
+        #weather-layer { position: fixed; inset: 0; pointer-events: none; z-index: 1; overflow: hidden; }
         
-        /* Particle Animations */
-        .rain { position: absolute; background: #64748b; width: 1.5px; height: 18px; animation: fall linear infinite; opacity: 0.5; }
-        .shower-icon { position: absolute; animation: floatDown linear infinite; z-index: 5; }
+        /* Particle Shower Logic */
+        .rain { position: absolute; background: #64748b; width: 1.5px; height: 18px; animation: fall linear infinite; opacity: 0.4; top: -20px; }
+        .shower-icon { position: absolute; animation: floatDown linear infinite; z-index: 1; top: -50px; }
         
-        @keyframes fall { to { transform: translateY(105vh); } }
+        @keyframes fall { to { transform: translateY(110vh); } }
         @keyframes floatDown { 
-            0% { transform: translateY(-10vh) rotate(0deg); opacity: 0; }
+            0% { transform: translateY(0) rotate(0deg); opacity: 0; }
             10% { opacity: 1; }
-            90% { opacity: 1; }
-            100% { transform: translateY(105vh) rotate(360deg); opacity: 0; } 
+            100% { transform: translateY(110vh) rotate(360deg); opacity: 0; } 
         }
         
         .sidebar-active { background: #4f46e5 !important; color: white !important; }
         .dark .sidebar-active { background: #39FF14 !important; color: black !important; }
         .section { display: none; }
         .section.active { display: block; }
-        .modal-overlay { background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); display: none; position: fixed; inset: 0; z-index: 100; align-items: center; justify-content: center; }
+        .modal-overlay { background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); display: none; position: fixed; inset: 0; z-index: 100; align-items: center; justify-content: center; }
         .modal-overlay.open { display: flex; }
 
-        /* Overview Box Animated Background */
-        .mood-box-bg {
+        .mood-box-container {
             background-size: cover;
             background-position: center;
             position: relative;
             overflow: hidden;
+            border: 2px solid rgba(255,255,255,0.1);
         }
-        .mood-box-bg::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(5px);
-        }
+
+        .progress-bar { transition: width 1s ease-in-out; }
     </style>
 </head>
 <body class="flex min-h-screen bg-slate-50 dark:bg-darkBg text-slate-900 dark:text-zinc-100">
 
     <div id="weather-layer"></div>
 
-    <aside class="w-64 bg-white dark:bg-cardDark border-r border-slate-200 dark:border-zinc-800 hidden lg:flex flex-col sticky top-0 h-screen z-20">
+    <aside class="w-64 bg-white dark:bg-cardDark border-r dark:border-zinc-800 hidden lg:flex flex-col sticky top-0 h-screen z-20">
         <div class="p-8">
             <div class="flex items-center gap-2 mb-10">
                 <i class="fas fa-bolt text-indigo-600 dark:text-neon text-2xl"></i>
@@ -126,24 +119,25 @@ if (strpos($user_name, ' ') !== false) {
                     <i class="fas fa-receipt"></i> Expenses
                 </button>
                 <button onclick="switchTab('analytics', this)" class="nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl font-bold text-sm text-slate-500 dark:text-zinc-400 transition hover:bg-slate-50 dark:hover:bg-zinc-800 text-left">
-                    <i class="fas fa-chart-pie"></i> Analytics
+                    <i class="fas fa-chart-line"></i> Analytics
                 </button>
                 <button onclick="switchTab('budget', this)" class="nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl font-bold text-sm text-slate-500 dark:text-zinc-400 transition hover:bg-slate-50 dark:hover:bg-zinc-800 text-left">
-                    <i class="fas fa-sliders text-xs"></i> System Settings
+                    <i class="fas fa-sliders"></i> Settings
                 </button>
             </nav>
         </div>
         <div class="mt-auto p-6 border-t dark:border-zinc-800">
             <button onclick="toggleDarkMode()" class="w-full mb-4 py-2 rounded-lg border dark:border-zinc-700 flex items-center justify-center gap-2 text-xs font-black uppercase tracking-widest">
-                <i class="fas fa-moon"></i> UI MODE
+                <i class="fas fa-moon"></i> Appearance
             </button>
             <div class="flex items-center gap-3 p-2 bg-slate-50 dark:bg-zinc-900 rounded-2xl">
                 <div class="w-10 h-10 rounded-xl flex items-center justify-center text-white font-black" style="background:<?= $avatar_color ?>"><?= $initials ?></div>
                 <div class="flex-1 overflow-hidden">
-                    <p class="text-[10px] font-black uppercase text-indigo-500 dark:text-neon italic"><?= $mood_data['mood'] ?> Mode</p>
+                    <p class="text-[10px] font-black uppercase text-indigo-500 dark:text-neon tracking-widest"><?= strtoupper($mood_data['mood']) ?></p>
                     <p class="text-xs font-bold truncate"><?= $user_name ?></p>
                 </div>
             </div>
+            <a href="logout.php" class="block text-center mt-4 text-[10px] font-black uppercase tracking-[3px] text-slate-400 hover:text-red-500">Terminate</a>
         </div>
     </aside>
 
@@ -152,51 +146,58 @@ if (strpos($user_name, ' ') !== false) {
         <div id="overview" class="section active space-y-10">
             <header class="flex justify-between items-center">
                 <h1 class="text-3xl font-black italic uppercase">Workspace.</h1>
-                <form method="GET"><input type="month" name="month" value="<?= $month ?>" onchange="this.form.submit()" class="dark:bg-cardDark p-2 rounded-xl border dark:border-zinc-700 font-bold text-sm"></form>
+                <div class="flex gap-4">
+                    <a href="export_csv.php?month=<?= $month ?>" class="bg-white dark:bg-zinc-800 px-4 py-2 rounded-xl border dark:border-zinc-700 text-xs font-black uppercase tracking-widest"><i class="fas fa-download mr-2"></i> CSV</a>
+                    <form method="GET"><input type="month" name="month" value="<?= $month ?>" onchange="this.form.submit()" class="dark:bg-cardDark p-2 rounded-xl border dark:border-zinc-700 font-bold text-sm"></form>
+                </div>
             </header>
 
-            <div id="moodBox" class="mood-box-bg p-8 md:p-12 rounded-[3.5rem] shadow-2xl flex flex-col md:flex-row items-center gap-12 border-b-8 border-indigo-600 dark:border-neon">
-                <div class="flex-1 z-10">
-                    <h2 class="text-5xl font-black uppercase italic mb-4 dark:text-white"><?= $mood_data['mood'] ?> <span class="text-indigo-600 dark:text-neon">Status.</span></h2>
-                    <p class="text-slate-700 dark:text-zinc-200 text-xl font-semibold leading-relaxed drop-shadow-sm"><?= $mood_data['mood_message'] ?></p>
-                </div>
-                <div class="w-48 md:w-64 z-10">
-                    <img id="moodImg" src="" class="w-full drop-shadow-3xl transform hover:scale-110 transition duration-500">
+            <div id="moodBox" class="mood-box-container p-10 md:p-12 rounded-[3rem] shadow-2xl flex flex-col justify-center text-left border-b-8 border-indigo-600 dark:border-neon min-h-[220px]">
+                <div class="absolute inset-0 bg-gradient-to-r from-black/70 to-transparent z-0"></div>
+                
+                <div class="z-10 relative max-w-2xl">
+                    <span class="text-[10px] font-black uppercase tracking-[4px] text-indigo-300 dark:text-neon mb-3 block drop-shadow-md">Current System Status</span>
+                    <h2 class="text-4xl md:text-5xl font-black uppercase italic mb-3 text-white tracking-tighter drop-shadow-lg"><?= $mood_data['mood'] ?> MODE.</h2>
+                    <p class="text-white/90 text-lg font-semibold leading-relaxed drop-shadow-md max-w-xl"><?= $mood_data['mood_message'] ?></p>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div class="bg-white dark:bg-cardDark p-8 rounded-[2.5rem] border dark:border-zinc-800 shadow-sm transition hover:translate-y-[-5px]">
-                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Income Flow</p>
-                    <h3 class="text-3xl font-black text-emerald-500">₹<?= number_format($mood_data['total_income'], 2) ?></h3>
-                </div>
-                <div class="bg-white dark:bg-cardDark p-8 rounded-[2.5rem] border dark:border-zinc-800 shadow-sm transition hover:translate-y-[-5px]">
-                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Expenses</p>
-                    <h3 class="text-3xl font-black text-red-500">₹<?= number_format($mood_data['total_expenses'], 2) ?></h3>
-                </div>
-                <div class="bg-white dark:bg-cardDark p-8 rounded-[2.5rem] border dark:border-zinc-800 shadow-sm transition hover:translate-y-[-5px]">
-                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Budget Health</p>
-                    <h3 class="text-3xl font-black text-indigo-600 dark:text-neon"><?= $budget_pct ?>%</h3>
-                </div>
-            </div>
-        </div>
-
-        <div id="analytics" class="section space-y-10">
-            <h2 class="text-3xl font-black italic uppercase text-center">Data Analytics.</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div class="bg-white dark:bg-cardDark p-8 rounded-[2.5rem] shadow-lg border dark:border-zinc-800">
-                    <h3 class="text-xs font-black uppercase mb-6">Category Distribution</h3>
-                    <canvas id="categoryChart"></canvas>
-                </div>
-                <div class="bg-white dark:bg-cardDark p-8 rounded-[2.5rem] shadow-lg border dark:border-zinc-800">
-                    <h3 class="text-xs font-black uppercase mb-6">Monthly Spending Trend</h3>
-                    <canvas id="trendChart"></canvas>
-                </div>
-                <div class="bg-white dark:bg-cardDark p-8 rounded-[2.5rem] shadow-lg border dark:border-zinc-800 md:col-span-2">
-                    <h3 class="text-xs font-black uppercase mb-6 text-center">Mood Psychology Analysis</h3>
-                    <div class="h-64 flex items-center justify-center">
-                        <canvas id="moodAnalyticsChart"></canvas>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-white dark:bg-cardDark p-6 rounded-[2rem] shadow-sm border dark:border-zinc-800">
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Inflow</p>
+                        <h3 class="text-2xl font-black text-emerald-500">₹<?= number_format($mood_data['total_income'], 2) ?></h3>
                     </div>
+                    <div class="bg-white dark:bg-cardDark p-6 rounded-[2rem] shadow-sm border dark:border-zinc-800">
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Expenses</p>
+                        <h3 class="text-2xl font-black text-red-500">₹<?= number_format($mood_data['total_expenses'], 2) ?></h3>
+                    </div>
+                    <div class="bg-white dark:bg-cardDark p-6 rounded-[2rem] shadow-sm border dark:border-zinc-800">
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Current Savings</p>
+                        <h3 class="text-2xl font-black <?= $savings < 0 ? 'text-red-600' : 'text-indigo-600 dark:text-neon' ?>">
+                            <?= $savings < 0 ? '- ' : '' ?>₹<?= number_format(abs($savings), 2) ?>
+                        </h3>
+                    </div>
+                    <div class="bg-white dark:bg-cardDark p-6 rounded-[2rem] shadow-sm border dark:border-zinc-800">
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Budget Amount</p>
+                        <h3 class="text-2xl font-black text-slate-800 dark:text-white">₹<?= number_format($mood_data['budget_limit'], 2) ?></h3>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-cardDark p-8 rounded-[3rem] shadow-sm border dark:border-zinc-800 flex flex-col justify-center">
+                    <div class="flex justify-between items-end mb-4">
+                        <div>
+                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Monthly Spending Analysis</p>
+                            <h4 class="text-xl font-black uppercase italic">Budget Usage</h4>
+                        </div>
+                        <span class="text-3xl font-black <?= $budget_pct >= 90 ? 'text-red-600' : 'text-indigo-600 dark:text-neon' ?>"><?= $budget_pct ?>%</span>
+                    </div>
+                    <div class="w-full h-6 bg-slate-100 dark:bg-zinc-800 rounded-full overflow-hidden p-1">
+                        <div class="progress-bar h-full rounded-full <?= $budget_pct >= 90 ? 'bg-red-500 shadow-[0_0_15px_#ef4444]' : 'bg-indigo-600 dark:bg-neon shadow-[0_0_15px_rgba(57,255,20,0.5)]' ?>" style="width: <?= $budget_pct ?>%"></div>
+                    </div>
+                    <p class="mt-4 text-xs font-bold text-slate-400 italic">
+                        <?= $budget_pct >= 100 ? "WARNING: Systems exceeded budget capacity!" : "Efficiency: Remaining within designated limits." ?>
+                    </p>
                 </div>
             </div>
         </div>
@@ -204,18 +205,19 @@ if (strpos($user_name, ' ') !== false) {
         <div id="income" class="section space-y-8">
             <div class="flex justify-between items-center">
                 <h2 class="text-3xl font-black italic uppercase">Income Logs.</h2>
-                <button onclick="openModal('incomeModal')" class="bg-slate-900 dark:bg-neon dark:text-black text-white px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg">+ New Entry</button>
+                <button onclick="openModal('incomeModal')" class="bg-slate-900 dark:bg-neon dark:text-black text-white px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg">+ Add Entry</button>
             </div>
-            <div class="bg-white dark:bg-cardDark rounded-[3rem] p-8 shadow-2xl border dark:border-zinc-800">
+            <div class="bg-white dark:bg-cardDark rounded-[3rem] p-8 shadow-2xl border dark:border-zinc-800 overflow-hidden">
                 <table class="w-full text-left">
-                    <thead><tr class="text-[10px] font-black uppercase text-slate-400 border-b dark:border-zinc-800"><th class="pb-6">Source</th><th class="pb-6">Amount</th><th class="pb-6">Date</th><th class="pb-6 text-right">Delete</th></tr></thead>
+                    <thead><tr class="text-[10px] font-black uppercase text-slate-400 border-b dark:border-zinc-800"><th class="pb-6 px-4">Source</th><th class="pb-6">Amount</th><th class="pb-6">Date</th><th class="pb-6">Note</th><th class="pb-6 text-right pr-4">Action</th></tr></thead>
                     <tbody>
                         <?php while($row = $income_rows->fetch_assoc()): ?>
                         <tr class="border-b dark:border-zinc-800 hover:bg-slate-50 dark:hover:bg-zinc-900 transition">
-                            <td class="py-6 font-bold"><?= $row['source'] ?></td>
-                            <td class="py-6 text-emerald-500 font-black">+₹<?= $row['amount'] ?></td>
+                            <td class="py-6 px-4 font-bold"><?= htmlspecialchars($row['source']) ?></td>
+                            <td class="py-6 text-emerald-500 font-black">+₹<?= number_format($row['amount'], 2) ?></td>
                             <td class="py-6 text-slate-400 text-sm"><?= $row['date'] ?></td>
-                            <td class="py-6 text-right"><button onclick="deleteRecord('income', <?= $row['id'] ?>)" class="text-slate-300 hover:text-red-500 transition"><i class="fas fa-trash-alt"></i></button></td>
+                            <td class="py-6 text-slate-500 italic text-xs max-w-xs truncate"><?= htmlspecialchars($row['note'] ?? 'No notes') ?></td>
+                            <td class="py-6 text-right pr-4"><button onclick="deleteRecord('income', <?= $row['id'] ?>)" class="text-slate-300 hover:text-red-500 transition"><i class="fas fa-trash-alt"></i></button></td>
                         </tr>
                         <?php endwhile; ?>
                     </tbody>
@@ -226,18 +228,19 @@ if (strpos($user_name, ' ') !== false) {
         <div id="expenses" class="section space-y-8">
             <div class="flex justify-between items-center">
                 <h2 class="text-3xl font-black italic uppercase">Expense Logs.</h2>
-                <button onclick="openModal('expenseModal')" class="bg-slate-900 dark:bg-neon dark:text-black text-white px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg">+ New Entry</button>
+                <button onclick="openModal('expenseModal')" class="bg-slate-900 dark:bg-neon dark:text-black text-white px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg">+ Add Entry</button>
             </div>
             <div class="bg-white dark:bg-cardDark rounded-[3rem] p-8 shadow-2xl border dark:border-zinc-800">
                 <table class="w-full text-left">
-                    <thead><tr class="text-[10px] font-black uppercase text-slate-400 border-b dark:border-zinc-800"><th class="pb-6">Category</th><th class="pb-6">Title</th><th class="pb-6">Amount</th><th class="pb-6 text-right">Delete</th></tr></thead>
+                    <thead><tr class="text-[10px] font-black uppercase text-slate-400 border-b dark:border-zinc-800"><th class="pb-6 px-4">Category</th><th class="pb-6">Title</th><th class="pb-6">Amount</th><th class="pb-6">Date</th><th class="pb-6 text-right pr-4">Action</th></tr></thead>
                     <tbody>
                         <?php while($row = $expenses->fetch_assoc()): ?>
                         <tr class="border-b dark:border-zinc-800 hover:bg-slate-50 dark:hover:bg-zinc-900 transition">
-                            <td class="py-6"><span class="px-4 py-1 bg-slate-100 dark:bg-zinc-800 rounded-full text-[10px] font-black uppercase"><?= $row['category'] ?></span></td>
-                            <td class="py-6 font-bold"><?= $row['title'] ?></td>
-                            <td class="py-6 text-red-500 font-black">-₹<?= $row['amount'] ?></td>
-                            <td class="py-6 text-right"><button onclick="deleteRecord('expense', <?= $row['id'] ?>)" class="text-slate-300 hover:text-red-500 transition"><i class="fas fa-trash-alt"></i></button></td>
+                            <td class="py-6 px-4"><span class="px-4 py-1 bg-slate-100 dark:bg-zinc-800 rounded-full text-[10px] font-black uppercase"><?= $row['category'] ?></span></td>
+                            <td class="py-6 font-bold uppercase tracking-tight"><?= htmlspecialchars($row['title']) ?></td>
+                            <td class="py-6 text-red-500 font-black">-₹<?= number_format($row['amount'], 2) ?></td>
+                            <td class="py-6 text-slate-400 text-sm"><?= $row['date'] ?></td>
+                            <td class="py-6 text-right pr-4"><button onclick="deleteRecord('expense', <?= $row['id'] ?>)" class="text-slate-300 hover:text-red-500 transition"><i class="fas fa-trash-alt"></i></button></td>
                         </tr>
                         <?php endwhile; ?>
                     </tbody>
@@ -245,14 +248,34 @@ if (strpos($user_name, ' ') !== false) {
             </div>
         </div>
 
+        <div id="analytics" class="section space-y-10">
+            <h2 class="text-3xl font-black italic uppercase text-center">Financial Intelligence.</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-white dark:bg-cardDark p-8 rounded-[3rem] shadow-xl border dark:border-zinc-800">
+                    <h3 class="text-xs font-black uppercase mb-6 italic">Spending Categories</h3>
+                    <canvas id="categoryChart"></canvas>
+                </div>
+                <div class="bg-white dark:bg-cardDark p-8 rounded-[3rem] shadow-xl border dark:border-zinc-800">
+                    <h3 class="text-xs font-black uppercase mb-6 italic">Cashflow Dynamics</h3>
+                    <canvas id="trendChart"></canvas>
+                </div>
+                <div class="bg-white dark:bg-cardDark p-8 rounded-[3rem] shadow-xl border dark:border-zinc-800 md:col-span-2">
+                    <h3 class="text-xs font-black uppercase mb-6 italic text-center">Mood History Metrics</h3>
+                    <div class="h-64 flex justify-center">
+                        <canvas id="moodChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div id="budget" class="section space-y-8">
-             <h2 class="text-3xl font-black italic uppercase text-center">System Config.</h2>
+             <h2 class="text-3xl font-black italic uppercase text-center">System Settings.</h2>
              <div class="max-w-xl mx-auto bg-white dark:bg-cardDark p-12 rounded-[4rem] shadow-2xl border dark:border-zinc-800 text-center">
-                 <p class="text-sm font-bold text-slate-400 uppercase tracking-[4px] mb-8">Set Global Budget Limit</p>
-                 <h3 class="text-6xl font-black mb-12">₹<?= number_format($mood_data['budget_limit'], 0) ?></h3>
+                 <p class="text-sm font-bold text-slate-400 uppercase tracking-[4px] mb-8">Set Active System Limit</p>
+                 <h3 class="text-6xl font-black mb-12 italic">₹<?= number_format($mood_data['budget_limit'], 0) ?></h3>
                  <form id="budgetSetForm" class="space-y-6">
-                     <input type="number" id="newBudgetAmount" placeholder="New Limit (₹)" class="w-full p-5 bg-slate-50 dark:bg-zinc-900 rounded-3xl outline-none border dark:border-zinc-800 text-center text-2xl font-black">
-                     <button type="submit" class="w-full py-5 bg-indigo-600 dark:bg-neon dark:text-black text-white rounded-3xl font-black text-xs uppercase tracking-[5px] hover:shadow-2xl active:scale-95 transition">Apply Global Configuration</button>
+                     <input type="number" id="newBudgetAmount" placeholder="New Limit (₹)" class="w-full p-5 bg-slate-50 dark:bg-zinc-900 rounded-3xl outline-none border dark:border-zinc-800 text-center text-3xl font-black">
+                     <button type="submit" class="w-full py-5 bg-indigo-600 dark:bg-neon dark:text-black text-white rounded-3xl font-black text-xs uppercase tracking-[5px] hover:shadow-2xl transition active:scale-95">Update Configuration</button>
                  </form>
              </div>
         </div>
@@ -260,30 +283,32 @@ if (strpos($user_name, ' ') !== false) {
     </main>
 
     <div class="modal-overlay" id="incomeModal">
-        <div class="bg-white dark:bg-cardDark w-full max-w-md p-10 rounded-[3rem] relative shadow-2xl">
-            <button onclick="closeModal('incomeModal')" class="absolute top-8 right-8 text-slate-300"><i class="fas fa-times"></i></button>
+        <div class="bg-white dark:bg-cardDark w-full max-w-md p-10 rounded-[3.5rem] relative shadow-2xl">
+            <button onclick="closeModal('incomeModal')" class="absolute top-8 right-8 text-slate-300"><i class="fas fa-times text-xl"></i></button>
             <h3 class="text-2xl font-black uppercase italic mb-8">Add Inflow.</h3>
             <form id="incomeForm" class="space-y-4">
-                <input type="text" id="income_source" placeholder="Source Name" class="w-full p-4 bg-slate-50 dark:bg-zinc-900 rounded-2xl outline-none" required>
+                <input type="text" id="income_source" placeholder="Source (e.g. Salary)" class="w-full p-4 bg-slate-50 dark:bg-zinc-900 rounded-2xl outline-none" required>
                 <input type="number" id="income_amount" placeholder="Amount (₹)" class="w-full p-4 bg-slate-50 dark:bg-zinc-900 rounded-2xl outline-none" required>
                 <input type="date" id="income_date" class="w-full p-4 bg-slate-50 dark:bg-zinc-900 rounded-2xl outline-none" required>
-                <button type="submit" class="w-full py-4 bg-slate-900 dark:bg-neon dark:text-black text-white rounded-2xl font-black uppercase tracking-widest mt-4">Confirm Entry</button>
+                <textarea id="income_note" placeholder="Note (Optional)" class="w-full p-4 bg-slate-50 dark:bg-zinc-900 rounded-2xl outline-none" rows="2"></textarea>
+                <button type="submit" class="w-full py-5 bg-slate-900 dark:bg-neon dark:text-black text-white rounded-2xl font-black uppercase tracking-widest mt-4">Confirm Entry</button>
             </form>
         </div>
     </div>
 
     <div class="modal-overlay" id="expenseModal">
-        <div class="bg-white dark:bg-cardDark w-full max-w-md p-10 rounded-[3rem] relative shadow-2xl">
-            <button onclick="closeModal('expenseModal')" class="absolute top-8 right-8 text-slate-300"><i class="fas fa-times"></i></button>
+        <div class="bg-white dark:bg-cardDark w-full max-w-md p-10 rounded-[3.5rem] relative shadow-2xl">
+            <button onclick="closeModal('expenseModal')" class="absolute top-8 right-8 text-slate-300"><i class="fas fa-times text-xl"></i></button>
             <h3 class="text-2xl font-black uppercase italic mb-8">Add Outflow.</h3>
             <form id="expenseForm" class="space-y-4">
-                <input type="text" id="expense_title" placeholder="Expense Title" class="w-full p-4 bg-slate-50 dark:bg-zinc-900 rounded-2xl outline-none" required>
+                <input type="text" id="expense_title" placeholder="Description" class="w-full p-4 bg-slate-50 dark:bg-zinc-900 rounded-2xl outline-none" required>
                 <select id="expense_category" class="w-full p-4 bg-slate-50 dark:bg-zinc-900 rounded-2xl outline-none">
                     <option>Food</option><option>Travel</option><option>Books</option><option>Entertainment</option><option>Shopping</option><option>Other</option>
                 </select>
                 <input type="number" id="expense_amount" placeholder="Amount (₹)" class="w-full p-4 bg-slate-50 dark:bg-zinc-900 rounded-2xl outline-none" required>
                 <input type="date" id="expense_date" class="w-full p-4 bg-slate-50 dark:bg-zinc-900 rounded-2xl outline-none" required>
-                <button type="submit" class="w-full py-4 bg-slate-900 dark:bg-neon dark:text-black text-white rounded-2xl font-black uppercase tracking-widest mt-4">Confirm Entry</button>
+                <textarea id="expense_note" placeholder="Note (Optional)" class="w-full p-4 bg-slate-50 dark:bg-zinc-900 rounded-2xl outline-none" rows="2"></textarea>
+                <button type="submit" class="w-full py-5 bg-slate-900 dark:bg-neon dark:text-black text-white rounded-2xl font-black uppercase tracking-widest mt-4">Confirm Entry</button>
             </form>
         </div>
     </div>
@@ -295,58 +320,44 @@ if (strpos($user_name, ' ') !== false) {
         function applyTheme() {
             const html = document.getElementById('mainHtml');
             isDark ? html.classList.add('dark') : html.classList.remove('dark');
-            
-            const moodImg = document.getElementById('moodImg');
-            const moodBox = document.getElementById('moodBox');
+            const mb = document.getElementById('moodBox');
 
+            // BOX BACKGROUND GIFS
             if(MOOD === 'sad') {
-                moodImg.src = "asssets/welcome1.jpg";
-                moodBox.style.backgroundImage = "url('assets/sad1.gif')";
+                mb.style.backgroundImage = "url('assets/sad.gif')";
             } else if (MOOD === 'neutral') {
-                moodImg.src = "https://cdni.iconscout.com/illustration/premium/thumb/cloudy-weather-5210988.png";
-                moodBox.style.backgroundImage = "url('https://i.pinimg.com/originals/80/7e/d3/807ed33555238bc358509800edec6523.gif')";
+                mb.style.backgroundImage = "url('assets/neutral.gif')";
             } else {
-                moodImg.src = isDark ? "https://cdni.iconscout.com/illustration/premium/thumb/mountain-night-scene-5016601.png" : "https://cdni.iconscout.com/illustration/premium/thumb/nature-landscape-5016597.png";
-                moodBox.style.backgroundImage = isDark ? "url('https://i.pinimg.com/originals/30/a4/09/30a409950d879f87498c4d29e7943486.gif')" : "url('https://i.pinimg.com/originals/74/61/88/74618841a0b3b448a31e846ef3294371.gif')";
+                mb.style.backgroundImage = isDark ? "url('assets/night sky GIF.gif')" : "url('assets/happy.gif')";
             }
             initWeather();
         }
 
-        function toggleDarkMode() {
-            isDark = !isDark;
-            localStorage.setItem('darkMode', isDark);
-            applyTheme();
-        }
+        function toggleDarkMode() { isDark = !isDark; localStorage.setItem('darkMode', isDark); applyTheme(); }
 
-        // NEW ENHANCED SHOWER LOGIC
+        // --- DYNAMIC SHOWER ---
         function initWeather() {
             const layer = document.getElementById('weather-layer');
             layer.innerHTML = '';
-            if(MOOD === 'sad') {
-                for(let i=0; i<80; i++){
-                    let d = document.createElement('div'); d.className = 'rain';
-                    d.style.left = Math.random()*100+'vw'; d.style.animationDuration = Math.random()*0.5+0.5+'s';
-                    d.style.animationDelay = Math.random()*2+'s'; layer.appendChild(d);
-                }
-            } else if(MOOD === 'happy') {
-                // ICON CONFIG
-                const config = [
-                    { icon: 'fa-sun', color: 'text-orange-400' },
-                    { icon: 'fa-moon', color: 'text-slate-100' },
-                    { icon: 'fa-spa', color: 'text-pink-300' },
-                    { icon: 'fa-certificate', color: 'text-yellow-300' }
-                ];
-                for(let i=0; i<35; i++){
-                    let item = config[Math.floor(Math.random()*config.length)];
-                    let p = document.createElement('i');
-                    p.className = `fas ${item.icon} ${item.color} shower-icon`;
-                    p.style.left = Math.random()*100+'vw';
-                    p.style.fontSize = Math.random()*15+10+'px';
-                    p.style.animationDuration = Math.random()*5+4+'s';
-                    p.style.animationDelay = Math.random()*8+'s';
-                    layer.appendChild(p);
-                }
-            }
+            
+            setInterval(() => {
+                const p = document.createElement(MOOD === 'sad' ? 'div' : 'i');
+                if(MOOD === 'sad') {
+                    p.className = 'rain';
+                } else if(MOOD === 'happy') {
+                    const icons = isDark ? 
+                        [{i:'fa-moon', c:'text-slate-100'}, {i:'fa-star', c:'text-yellow-200'}] : 
+                        [{i:'fa-sun', c:'text-orange-400'}, {i:'fa-spa', c:'text-pink-400'}];
+                    const choice = icons[Math.floor(Math.random()*icons.length)];
+                    p.className = `fas ${choice.i} ${choice.c} shower-icon`;
+                    p.style.fontSize = Math.random()*20+10+'px';
+                } else { return; }
+
+                p.style.left = Math.random()*100+'vw';
+                p.style.animationDuration = Math.random()*3+2+'s';
+                layer.appendChild(p);
+                setTimeout(() => p.remove(), 5000);
+            }, MOOD === 'sad' ? 100 : 300);
         }
 
         function switchTab(id, btn) {
@@ -367,56 +378,23 @@ if (strpos($user_name, ' ') !== false) {
 
         document.getElementById('incomeForm').onsubmit = e => {
             e.preventDefault();
-            handleForm('add_income.php', { source: document.getElementById('income_source').value, amount: document.getElementById('income_amount').value, date: document.getElementById('income_date').value });
+            handleForm('add_income.php', { source: document.getElementById('income_source').value, amount: document.getElementById('income_amount').value, date: document.getElementById('income_date').value, note: document.getElementById('income_note').value });
         }
         document.getElementById('expenseForm').onsubmit = e => {
             e.preventDefault();
-            handleForm('add_expense.php', { title: document.getElementById('expense_title').value, category: document.getElementById('expense_category').value, amount: document.getElementById('expense_amount').value, date: document.getElementById('expense_date').value });
+            handleForm('add_expense.php', { title: document.getElementById('expense_title').value, category: document.getElementById('expense_category').value, amount: document.getElementById('expense_amount').value, date: document.getElementById('expense_date').value, note: document.getElementById('expense_note').value });
         }
         document.getElementById('budgetSetForm').onsubmit = e => {
             e.preventDefault();
             handleForm('update_budget.php', { amount: document.getElementById('newBudgetAmount').value, month: "<?= $month ?>" });
         }
-        function deleteRecord(type, id) { if(confirm('Confirm Permanent Deletion?')) handleForm('delete_expense.php', {type, id}); }
+        function deleteRecord(type, id) { if(confirm('Delete permanently?')) handleForm('delete_expense.php', {type, id}); }
 
-        // --- ENHANCED COLORFUL CHARTS ---
-        new Chart(document.getElementById('categoryChart'), {
-            type: 'doughnut',
-            data: { 
-                labels: <?= json_encode($cat_labels) ?>, 
-                datasets: [{ 
-                    data: <?= json_encode($cat_amounts) ?>, 
-                    backgroundColor: ['#39FF14', '#4f46e5', '#f59e0b', '#ef4444', '#06b6d4', '#ec4899'],
-                    borderColor: 'transparent'
-                }] 
-            },
-            options: { plugins: { legend: { position: 'right', labels: { color: isDark ? '#fff' : '#000' } } } }
-        });
-
-        new Chart(document.getElementById('trendChart'), {
-            type: 'bar',
-            data: { 
-                labels: <?= json_encode($monthly_labels) ?>, 
-                datasets: [{ 
-                    label: 'Spend Log', 
-                    data: <?= json_encode($monthly_amounts) ?>, 
-                    backgroundColor: ['#4f46e5', '#39FF14', '#f59e0b', '#06b6d4', '#ef4444', '#8b5cf6'],
-                    borderRadius: 10
-                }] 
-            }
-        });
-
-        new Chart(document.getElementById('moodAnalyticsChart'), {
-            type: 'pie',
-            data: { 
-                labels: <?= json_encode($m_labels) ?>, 
-                datasets: [{ 
-                    data: <?= json_encode($m_counts) ?>, 
-                    backgroundColor: ['#39FF14', '#4f46e5', '#ef4444'],
-                }] 
-            },
-            options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
-        });
+        // --- CHARTS ---
+        const colors = ['#39FF14', '#4f46e5', '#f59e0b', '#ef4444', '#06b6d4', '#ec4899'];
+        new Chart(document.getElementById('categoryChart'), { type: 'doughnut', data: { labels: <?= json_encode($cat_labels) ?>, datasets: [{ data: <?= json_encode($cat_amounts) ?>, backgroundColor: colors, borderColor: 'transparent' }] }, options: { plugins: { legend: { position: 'right', labels: { color: isDark ? '#fff' : '#000' } } } } });
+        new Chart(document.getElementById('trendChart'), { type: 'bar', data: { labels: <?= json_encode($monthly_labels) ?>, datasets: [{ label: 'Cash Outflow', data: <?= json_encode($monthly_amounts) ?>, backgroundColor: isDark ? '#39FF14' : '#4f46e5', borderRadius: 10 }] }, options: { plugins: { legend: { labels: { color: isDark ? '#fff' : '#000' } } } } });
+        new Chart(document.getElementById('moodChart'), { type: 'pie', data: { labels: <?= json_encode($m_labels) ?>, datasets: [{ data: <?= json_encode($m_counts) ?>, backgroundColor: ['#39FF14','#4f46e5','#ef4444'] }] }, options: { plugins: { legend: { labels: { color: isDark ? '#fff' : '#000' } } } } });
 
         applyTheme();
     </script>

@@ -9,15 +9,9 @@ require_once 'db.php';
 $error = '';
 $success = '';
 
-// Check for messages passed from reset_logic.php
-if (isset($_GET['error'])) {
-    $error = htmlspecialchars($_GET['error']);
-}
-if (isset($_GET['success'])) {
-    $success = htmlspecialchars($_GET['success']);
-}
+if (isset($_GET['error'])) { $error = htmlspecialchars($_GET['error']); }
+if (isset($_GET['success'])) { $success = htmlspecialchars($_GET['success']); }
 
-// Handle Login POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login_submit'])) {
     $email = sanitize($conn, $_POST['email'] ?? '');
     $password = $_POST['password'] ?? '';
@@ -83,21 +77,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login_submit'])) {
         </a>
     </div>
 
-    <div class="w-full max-w-3xl bg-white rounded-[2rem] overflow-hidden flex flex-col md:flex-row shadow-2xl shadow-slate-200/50 my-auto">
+    <div class="w-full max-w-4xl bg-white rounded-[2rem] overflow-hidden flex flex-col md:flex-row shadow-2xl shadow-slate-200/50 my-auto min-h-[500px]">
         
-        <div class="md:w-5/12 side-panel p-8 text-white flex flex-col justify-between relative">
-            <div class="z-10">
-                <div class="flex items-center gap-2 mb-8">
+        <div class="md:w-5/12 side-panel p-8 md:p-10 text-white flex flex-col relative overflow-hidden">
+            <div class="z-10 relative">
+                <div class="flex items-center gap-2 mb-6">
                     <i class="fas fa-chart-pie text-xl"></i>
                     <span class="text-sm font-black uppercase tracking-[3px]">BudgetSense</span>
                 </div>
-                <h2 class="text-2xl font-black leading-tight mb-2">ACCESS<br>PORTAL.</h2>
+                <h2 class="text-3xl font-black leading-tight mb-2">ACCESS<br>PORTAL.</h2>
                 <p class="text-indigo-100 text-[11px] font-medium opacity-70">Monitor your assets securely.</p>
             </div>
             
-            <div class="mt-6 flex justify-center md:block">
-                <img src="https://cdni.iconscout.com/illustration/premium/thumb/secure-login-5381017.png" class="w-24 md:w-36 opacity-90 drop-shadow-xl mx-auto md:mx-0">
+            <div class="hidden md:flex flex-1 items-center justify-center w-full mt-6 relative z-10">
+                <img src="assets/login.png" class="w-full max-w-[320px] object-contain drop-shadow-2xl transform hover:scale-105 transition duration-500">
             </div>
+
+            <div class="absolute bottom-[-10%] right-[-10%] w-48 h-48 bg-white/10 rounded-full blur-2xl"></div>
         </div>
 
         <div class="md:w-7/12 p-8 md:p-12 flex flex-col justify-center bg-white">
@@ -134,7 +130,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login_submit'])) {
                 </div>
 
                 <div class="flex justify-end">
-                    <button type="button" onclick="toggleModal()" class="text-[10px] font-bold text-indigo-600 hover:text-indigo-800 transition">Forgot Security Key?</button>
+                    <button type="button" onclick="toggleModal()" class="text-[10px] font-bold text-indigo-600 hover:text-indigo-800 transition">Forgot Password?</button>
                 </div>
 
                 <button type="submit" name="login_submit" class="w-full py-4 bg-slate-900 text-white rounded-xl font-bold text-[11px] uppercase tracking-widest hover:bg-indigo-600 transition-all shadow-lg active:scale-95">
@@ -146,10 +142,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login_submit'])) {
                 New User? <a href="signup.php" class="text-indigo-600 ml-1 hover:underline">Create Account</a>
             </p>
         </div>
-    </div>
-
-    <div class="mt-8 opacity-20">
-        <p class="text-[9px] font-black uppercase tracking-[5px]">Core Systems v2.6.0</p>
     </div>
 
     <div id="forgotModal" class="modal-overlay p-4">
@@ -178,6 +170,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login_submit'])) {
             modal.classList.toggle('active');
         }
     </script>
-
 </body>
 </html>
