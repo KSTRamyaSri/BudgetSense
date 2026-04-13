@@ -1,7 +1,7 @@
 <div align="center">
 
 # BUDGETSENSE: STUDENT BUDGETING WORKSPACE
-**Design Thinking Laboratory Project | B.Tech Year II Semester II**
+**Design Thinking Laboratory Project | B.Tech Year II Semester II | Pragati Engineering College**
 
 [![Deployment Status](https://img.shields.io/badge/Status-Live-success?style=for-the-badge)](http://budget.ct.ws/welcome.php)
 [![PHP](https://img.shields.io/badge/PHP-8.x-777BB4?style=for-the-badge&logo=php&logoColor=white)]()
@@ -22,30 +22,26 @@
   
   **1. The Welcome Portal**
   <br>
-  <img src="screenshots/Screenshot (36).png" alt="Welcome Page" width="800" style="border-radius: 10px; box-shadow: 0px 4px 15px rgba(0,0,0,0.1);"/>
+  <img src="screenshots/welcome-page.png" alt="Welcome Page" width="800" style="border-radius: 10px; box-shadow: 0px 4px 15px rgba(0,0,0,0.1);"/>
   <br><br>
 
   **2. Core Dashboard Analytics & States**
   <br>
   <p align="center">
-    <img src="screenshots/Screenshot (37).png" alt="Happy State Light" width="48%" style="border-radius: 10px;"/>
+    <img src="screenshots/happy-light.png" alt="Happy State Light" width="48%" style="border-radius: 10px;"/>
     &nbsp;
-    
-    <img src="screenshots/Screenshot (39).png" alt="Sad State Light" width="48%" style="border-radius: 10px;"/>
+    <img src="screenshots/sad-light.png" alt="Sad State Light" width="48%" style="border-radius: 10px;"/>
   </p>
   <br>
   <p align="center">
-   
-    <img src="screenshots/Screenshot (40).png" alt="Analytics View" width="48%" style="border-radius: 10px;"/>
+    <img src="screenshots/analytics.png" alt="Analytics View" width="48%" style="border-radius: 10px;"/>
   </p>
   <br>
   
   **3. Previous Iteration (Dark Mode Focus)**
   <br>
- 
-    <p align="center">
-    <img src="screenshots/Screenshot (38).png" alt="Happy State Dark" width="48%" style="border-radius: 10px;"/>
-    &nbsp;
+  <p align="center">
+    <img src="screenshots/happy-dark.png" alt="Happy State Dark" width="48%" style="border-radius: 10px;"/>
   </p>
   <br><br>
 
@@ -65,7 +61,6 @@
 ---
 
 ## II. DEVELOPMENT TEAM
-**Team: K.S.T. Ramya Sri**
 
 * **K. S. T. Ramya Sri**
 * **N. Param Singh Naik**
